@@ -8,7 +8,7 @@ import { Timeline } from './core/Timeline';
 import { Theme, UserPreferences } from './types/theme';
 import { Project, ProjectStatus, OrbitalRing, PlanetSize } from './types/project';
 import { cosmicDarkTheme, applyCosmicDarkStyles } from './themes/cosmic-dark';
-import { terminalGreenTheme } from './themes/terminal-green';
+import { terminalGreenTheme, applyTerminalGreenStyles } from './themes/terminal-green';
 import { applyThemeToCSS } from './themes/base-theme';
 import { ErrorHandler } from './utils/errors';
 import { Validator } from './utils/validation';
@@ -74,6 +74,13 @@ export class ProjectNexus {
       this.isInitialized = true;
       console.log('Project Nexus initialized successfully');
       
+      // Register service worker for offline support
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => console.log('Service Worker registered:', registration))
+          .catch(error => console.error('Service Worker registration failed:', error));
+      }
+      
     } catch (error) {
       ErrorHandler.handle(error as Error);
       this.showError('Failed to initialize application');
@@ -121,6 +128,7 @@ export class ProjectNexus {
         break;
       case 'terminal-green':
         this.currentTheme = terminalGreenTheme;
+        applyTerminalGreenStyles();
         break;
       default:
         this.currentTheme = cosmicDarkTheme;
