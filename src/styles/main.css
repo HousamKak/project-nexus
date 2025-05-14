@@ -1,3 +1,6 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 /* src/styles/main.css */
 
 /* Reset and base styles */
@@ -13,6 +16,20 @@
   font-family: var(--font-primary);
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
+
+  /* RGB values for opacity modifications */
+  --color-bg-primary-rgb: 10, 11, 15;
+  --color-bg-secondary-rgb: 20, 21, 32;
+  --color-bg-tertiary-rgb: 31, 33, 50;
+  --color-text-primary-rgb: 255, 255, 255;
+  --color-text-secondary-rgb: 184, 193, 214;
+  --color-text-tertiary-rgb: 107, 114, 128;
+  --color-accent-primary-rgb: 74, 144, 226;
+  --color-accent-secondary-rgb: 103, 164, 255;
+  --color-success-rgb: 80, 200, 120;
+  --color-warning-rgb: 255, 184, 77;
+  --color-error-rgb: 231, 76, 60;
+  --color-info-rgb: 52, 152, 219;
 }
 
 html, body {

@@ -18,7 +18,9 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // Temporarily exclude missing images from caching
+        const filteredUrlsToCache = urlsToCache.filter(url => !url.includes('icon-192.png') && !url.includes('icon-512.png'));
+        return cache.addAll(filteredUrlsToCache);
       })
   );
 });

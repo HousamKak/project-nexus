@@ -9,29 +9,18 @@
     <meta name="description" content="A visual portfolio operating system where your digital creations come alive in an interactive cosmos">
     <meta name="author" content="Project Nexus">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/public/assets/favicon.svg">
-    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="/src/styles/main.css">
-    <link rel="stylesheet" href="/src/styles/galaxy.css">
-    <link rel="stylesheet" href="/src/styles/timeline.css">
-    <link rel="stylesheet" href="/src/styles/responsive.css">
     
     <!-- PWA Support -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
     
     <!-- iOS Support -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <script src="/dist/app.js" defer></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -60,7 +49,7 @@
             <div class="nav-left">
                 <button id="menu-toggle" class="nav-button" aria-label="Toggle menu">
                     <svg width="24" height="24" viewBox="0 0 24 24">
-                        <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
                     </svg>
                 </button>
                 <h1 class="app-title">Project Nexus</h1>
@@ -70,7 +59,7 @@
                 <div class="search-container">
                     <input type="search" id="global-search" class="search-input" placeholder="Search projects, files, or activities...">
                     <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20">
-                        <path d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12zM13.5 13.5L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12zM13.5 13.5L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
                     </svg>
                 </div>
             </div>
@@ -99,365 +88,106 @@
             </div>
         </nav>
 
-        <!-- Side Panel -->
-        <aside id="side-panel" class="side-panel">
-            <div class="panel-header">
-                <h2>Projects</h2>
-                <button id="add-project" class="add-button" aria-label="Add project">
-                    <svg width="20" height="20" viewBox="0 0 20 20">
-                        <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="project-filters">
-                <select id="project-filter" class="filter-select">
-                    <option value="all">All Projects</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                    <option value="archived">Archived</option>
-                </select>
-            </div>
-            
-            <div id="project-list" class="project-list">
-                <!-- Projects will be dynamically inserted here -->
-            </div>
-            
-            <div class="panel-footer">
-                <div class="storage-info">
-                    <span class="storage-used">0 MB</span>
-                    <span class="storage-total">/ 1 GB</span>
-                </div>
-                <button id="import-export" class="footer-button">
-                    Import/Export
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main id="main-content" class="main-content">
-            <!-- Galaxy View -->
-            <div id="galaxy-view" class="view-container active">
-                <canvas id="galaxy-canvas"></canvas>
-                
-                <!-- Galaxy Controls -->
-                <div class="galaxy-controls">
-                    <button id="zoom-in" class="control-button" aria-label="Zoom in">
+        <div class="main-layout">
+            <!-- Side Panel -->
+            <aside id="side-panel" class="side-panel">
+                <div class="panel-header">
+                    <h2>Projects</h2>
+                    <button id="add-project" class="add-button" aria-label="Add project">
                         <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M10 6v8M6 10h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <button id="zoom-out" class="control-button" aria-label="Zoom out">
-                        <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M6 10h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <button id="reset-view" class="control-button" aria-label="Reset view">
-                        <svg width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M10 4v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </button>
                 </div>
                 
-                <!-- Project Quick Info -->
-                <div id="project-info" class="project-info" style="display: none;">
-                    <h3 id="project-name"></h3>
-                    <div class="info-stats">
-                        <span id="file-count"></span>
-                        <span id="line-count"></span>
-                        <span id="last-updated"></span>
-                    </div>
-                    <button id="enter-project" class="action-button">Enter Project</button>
-                </div>
-            </div>
-
-            <!-- Timeline View -->
-            <div id="timeline-view" class="view-container">
-                <canvas id="timeline-canvas"></canvas>
-                
-                <!-- Timeline Controls -->
-                <div class="timeline-controls">
-                    <select id="timeline-scale" class="scale-select">
-                        <option value="hour">Hour</option>
-                        <option value="day" selected>Day</option>
-                        <option value="week">Week</option>
-                        <option value="month">Month</option>
-                        <option value="year">Year</option>
+                <div class="project-filters">
+                    <select id="project-filter" class="filter-select">
+                        <option value="all">All Projects</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="archived">Archived</option>
                     </select>
-                    
-                    <div class="date-range">
-                        <input type="date" id="start-date" class="date-input">
-                        <span>to</span>
-                        <input type="date" id="end-date" class="date-input">
-                    </div>
                 </div>
-            </div>
-
-            <!-- File Constellation View -->
-            <div id="constellation-view" class="view-container">
-                <canvas id="constellation-canvas"></canvas>
                 
-                <!-- File Filters -->
-                <div class="file-filters">
-                    <button class="filter-button active" data-type="all">All</button>
-                    <button class="filter-button" data-type="code">Code</button>
-                    <button class="filter-button" data-type="docs">Docs</button>
-                    <button class="filter-button" data-type="media">Media</button>
-                    <button class="filter-button" data-type="config">Config</button>
+                <div id="project-list" class="project-list">
+                    <!-- Projects will be dynamically inserted here -->
                 </div>
-            </div>
-
-            <!-- Grid View -->
-            <div id="grid-view" class="view-container">
-                <div class="grid-container">
-                    <!-- File grid will be dynamically inserted here -->
+                
+                <div class="panel-footer">
+                    <div class="storage-info">
+                        <span class="storage-used">0 MB</span>
+                        <span class="storage-total">/ 1 GB</span>
+                    </div>
+                    <button id="import-export" class="footer-button">
+                        Import/Export
+                    </button>
                 </div>
-            </div>
-        </main>
+            </aside>
 
-        <!-- Bottom Status Bar -->
-        <footer id="status-bar" class="status-bar">
-            <div class="status-left">
-                <span id="current-view"></span>
-                <span id="selection-count"></span>
-            </div>
-            
-            <div class="status-center">
-                <div id="activity-indicator" class="activity-indicator">
-                    <span class="indicator-dot"></span>
-                    <span id="activity-text">Ready</span>
-                </div>
-            </div>
-            
-            <div class="status-right">
-                <span id="sync-status">Synchronized</span>
-                <span id="current-time"></span>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Modal Dialogs -->
-    <div id="modal-overlay" class="modal-overlay" style="display: none;">
-        <!-- Add Project Modal -->
-        <div id="add-project-modal" class="modal" style="display: none;">
-            <div class="modal-header">
-                <h2>Create New Project</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="add-project-form">
-                    <div class="form-group">
-                        <label for="project-name-input">Project Name</label>
-                        <input type="text" id="project-name-input" required>
+            <!-- Main Content Area -->
+            <main id="main-content" class="main-content">
+                <!-- Galaxy View -->
+                <div id="galaxy-view" class="view-container galaxy-view active">
+                    <canvas id="galaxy-canvas" class="galaxy-canvas"></canvas>
+                    
+                    <!-- Galaxy Controls -->
+                    <div class="galaxy-controls">
+                        <button id="zoom-in" class="control-button" aria-label="Zoom in">
+                            <svg width="20" height="20" viewBox="0 0 20 20">
+                                <path d="M10 6v8M6 10h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <button id="zoom-out" class="control-button" aria-label="Zoom out">
+                            <svg width="20" height="20" viewBox="0 0 20 20">
+                                <path d="M6 10h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <button id="reset-view" class="control-button" aria-label="Reset view">
+                            <svg width="20" height="20" viewBox="0 0 20 20">
+                                <path d="M10 4v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                        </button>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="project-description">Description</label>
-                        <textarea id="project-description" rows="3"></textarea>
+                    <!-- Project Quick Info -->
+                    <div id="project-info" class="project-info" style="display: none;">
+                        <h3 id="project-name"></h3>
+                        <div class="info-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Files</span>
+                                <span class="stat-value" id="file-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Lines</span>
+                                <span class="stat-value" id="line-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Health</span>
+                                <span class="stat-value" id="project-health">100%</span>
+                            </div>
+                        </div>
+                        <button id="enter-project" class="action-button">Enter Project</button>
                     </div>
+                </div>
+
+                <!-- Timeline View -->
+                <div id="timeline-view" class="view-container timeline-view">
+                    <canvas id="timeline-canvas" class="timeline-canvas"></canvas>
                     
-                    <div class="form-group">
-                        <label for="project-path">Path</label>
-                        <div class="path-input-group">
-                            <input type="text" id="project-path" readonly>
-                            <button type="button" id="browse-path" class="browse-button">Browse</button>
+                    <!-- Timeline Controls -->
+                    <div class="timeline-controls">
+                        <select id="timeline-scale" class="scale-select">
+                            <option value="hour">Hour</option>
+                            <option value="day" selected>Day</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                            <option value="year">Year</option>
+                        </select>
+                        
+                        <div class="date-range">
+                            <input type="date" id="start-date" class="date-input">
+                            <span>to</span>
+                            <input type="date" id="end-date" class="date-input">
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="project-git">Git Repository (optional)</label>
-                        <input type="url" id="project-git" placeholder="https://github.com/user/repo">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Color Theme</label>
-                        <div class="color-picker">
-                            <button type="button" class="color-option" data-color="#4A90E2" style="background-color: #4A90E2"></button>
-                            <button type="button" class="color-option" data-color="#50C878" style="background-color: #50C878"></button>
-                            <button type="button" class="color-option" data-color="#FFB84D" style="background-color: #FFB84D"></button>
-                            <button type="button" class="color-option" data-color="#E74C3C" style="background-color: #E74C3C"></button>
-                            <button type="button" class="color-option" data-color="#9B59B6" style="background-color: #9B59B6"></button>
-                            <button type="button" class="color-option" data-color="#1ABC9C" style="background-color: #1ABC9C"></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="button-secondary" id="cancel-add-project">Cancel</button>
-                <button type="submit" form="add-project-form" class="button-primary">Create Project</button>
-            </div>
-        </div>
-
-        <!-- Settings Modal -->
-        <div id="settings-modal" class="modal" style="display: none;">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="settings-tabs">
-                    <button class="tab-button active" data-tab="general">General</button>
-                    <button class="tab-button" data-tab="appearance">Appearance</button>
-                    <button class="tab-button" data-tab="performance">Performance</button>
-                    <button class="tab-button" data-tab="backup">Backup</button>
-                </div>
-                
-                <div class="tab-content active" id="general-tab">
-                    <h3>General Settings</h3>
-                    
-                    <div class="setting-group">
-                        <label for="auto-save">
-                            <input type="checkbox" id="auto-save" checked>
-                            Enable auto-save
-                        </label>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="notifications">
-                            <input type="checkbox" id="notifications" checked>
-                            Show notifications
-                        </label>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="keyboard-shortcuts">
-                            <input type="checkbox" id="keyboard-shortcuts" checked>
-                            Enable keyboard shortcuts
-                        </label>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="default-view">Default View</label>
-                        <select id="default-view">
-                            <option value="galaxy">Galaxy</option>
-                            <option value="timeline">Timeline</option>
-                            <option value="constellation">File Constellation</option>
-                            <option value="grid">Grid</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="appearance-tab">
-                    <h3>Appearance</h3>
-                    
-                    <div class="setting-group">
-                        <label for="theme-select">Theme</label>
-                        <select id="theme-select">
-                            <option value="cosmic-dark">Cosmic Dark</option>
-                            <option value="terminal-green">Terminal Green</option>
-                            <option value="paper-light">Paper Light</option>
-                            <option value="cyberpunk">Cyberpunk</option>
-                            <option value="nature">Nature</option>
-                        </select>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="animations">
-                            <input type="checkbox" id="animations" checked>
-                            Enable animations
-                        </label>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="particle-effects">
-                            <input type="checkbox" id="particle-effects" checked>
-                            Enable particle effects
-                        </label>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="sound-effects">
-                            <input type="checkbox" id="sound-effects">
-                            Enable sound effects
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="performance-tab">
-                    <h3>Performance</h3>
-                    
-                    <div class="setting-group">
-                        <label for="render-quality">Render Quality</label>
-                        <select id="render-quality">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="ultra">Ultra</option>
-                        </select>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="max-particles">Max Particles</label>
-                        <input type="range" id="max-particles" min="100" max="2000" value="500">
-                        <span id="particle-count">500</span>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="cache-size">Cache Size</label>
-                        <input type="range" id="cache-size" min="50" max="500" value="100">
-                        <span id="cache-value">100 MB</span>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="backup-tab">
-                    <h3>Backup & Sync</h3>
-                    
-                    <div class="setting-group">
-                        <button class="action-button" id="export-data">Export All Data</button>
-                        <p class="help-text">Export all projects, files, and settings to a backup file</p>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <button class="action-button" id="import-data">Import Data</button>
-                        <p class="help-text">Import projects and settings from a backup file</p>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <button class="danger-button" id="clear-data">Clear All Data</button>
-                        <p class="help-text">Warning: This will permanently delete all projects and settings</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="button-secondary" id="cancel-settings">Cancel</button>
-                <button type="button" class="button-primary" id="save-settings">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Context Menus -->
-    <div id="context-menu" class="context-menu" style="display: none;">
-        <button class="context-item" id="ctx-open">Open</button>
-        <button class="context-item" id="ctx-rename">Rename</button>
-        <button class="context-item" id="ctx-duplicate">Duplicate</button>
-        <div class="context-separator"></div>
-        <button class="context-item" id="ctx-properties">Properties</button>
-        <button class="context-item danger" id="ctx-delete">Delete</button>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <!-- File Drop Zone -->
-    <div id="drop-zone" class="drop-zone" style="display: none;">
-        <div class="drop-zone-content">
-            <svg width="80" height="80" viewBox="0 0 80 80">
-                <path d="M40 20v40M20 40h40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
-            </svg>
-            <h2>Drop files or folders here</h2>
-            <p>Add to current project or create a new one</p>
-        </div>
-    </div>
-
-    <!-- Offline Banner -->
-    <div id="offline-banner" class="offline-banner" style="display: none;">
-        <span>You're offline - Working in local mode</span>
-    </div>
-</body>
-</html>

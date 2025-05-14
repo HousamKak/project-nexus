@@ -1,5 +1,11 @@
 // src/app.ts
 
+// Import CSS files
+import './styles/main.css';
+import './styles/galaxy.css';
+import './styles/timeline.css';
+import './styles/responsive.css';
+
 import { GalaxyView } from './core/GalaxyView';
 import { StorageManager } from './core/StorageManager';
 import { ProjectManager } from './core/ProjectManager';

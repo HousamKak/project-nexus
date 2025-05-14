@@ -28,7 +28,7 @@ module.exports = (env, argv) => {
           exclude: /node_modules/
         },
         
-        // CSS
+        // CSS - Updated to import all CSS files
         {
           test: /\.css$/,
           use: [
@@ -52,6 +52,15 @@ module.exports = (env, argv) => {
           type: 'asset/resource',
           generator: {
             filename: 'assets/fonts/[name].[hash][ext]'
+          }
+        },
+        
+        // Copy manifest.json to the output directory
+        {
+          test: /manifest\.json$/,
+          type: 'asset/resource',
+          generator: {
+            filename: '[name][ext]'
           }
         }
       ]
@@ -120,6 +129,12 @@ module.exports = (env, argv) => {
             priority: -10,
             reuseExistingChunk: true,
             name: 'vendors'
+          },
+          styles: {
+            name: 'styles',
+            test: /\.css$/,
+            chunks: 'all',
+            enforce: true
           }
         }
       },
@@ -130,14 +145,6 @@ module.exports = (env, argv) => {
       hints: isProduction ? 'warning' : false,
       maxEntrypointSize: 512000,
       maxAssetSize: 512000
-    },
-    
-    stats: {
-      colors: true,
-      modules: false,
-      children: false,
-      chunks: false,
-      chunkModules: false
     }
   };
 };

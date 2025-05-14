@@ -41,6 +41,11 @@ export class GalaxyView {
       throw new ValidationError('canvas', canvas, 'Failed to get 2D context');
     }
 
+    // Set canvas size to match container
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
     this.canvas = canvas;
     this.ctx = context;
     this.projects = new Map();
