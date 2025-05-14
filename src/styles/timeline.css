@@ -1,0 +1,453 @@
+/* src/styles/timeline.css */
+
+/* Timeline View Styles */
+.timeline-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-primary);
+  overflow: hidden;
+}
+
+.timeline-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: move;
+}
+
+/* Timeline Controls */
+.timeline-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 100;
+}
+
+.scale-select {
+  background: rgba(var(--color-bg-secondary-rgb), 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(var(--color-bg-secondary-rgb), 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+.date-input {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  width: 120px;
+}
+
+.date-input:focus {
+  outline: none;
+}
+
+/* Timeline Grid */
+.timeline-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.timeline-line {
+  stroke: rgba(var(--color-text-tertiary-rgb), 0.2);
+  stroke-width: 1;
+}
+
+.timeline-line.major {
+  stroke: rgba(var(--color-text-tertiary-rgb), 0.4);
+  stroke-width: 2;
+}
+
+.timeline-label {
+  fill: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-primary);
+}
+
+/* Activity Events */
+.timeline-event {
+  position: absolute;
+  background: rgba(var(--color-bg-secondary-rgb), 0.8);
+  border-left: 3px solid var(--color-accent-primary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all var(--animation-fast);
+  min-width: 200px;
+}
+
+.timeline-event:hover {
+  background: rgba(var(--color-bg-secondary-rgb), 0.95);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+.timeline-event.commit {
+  border-left-color: var(--color-success);
+}
+
+.timeline-event.deployment {
+  border-left-color: var(--color-warning);
+}
+
+.timeline-event.error {
+  border-left-color: var(--color-error);
+}
+
+.timeline-event.milestone {
+  border-left-color: var(--color-info);
+}
+
+.event-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.25rem;
+}
+
+.event-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.event-description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Activity Bars */
+.activity-bar {
+  position: absolute;
+  background: var(--color-accent-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--animation-fast);
+  min-height: 4px;
+}
+
+.activity-bar:hover {
+  transform: scaleY(1.2);
+  filter: brightness(1.2);
+}
+
+.activity-bar.commits {
+  background: var(--color-success);
+}
+
+.activity-bar.files {
+  background: var(--color-info);
+}
+
+.activity-bar.lines {
+  background: var(--color-warning);
+}
+
+/* Heatmap View */
+.heatmap-container {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  background: rgba(var(--color-bg-secondary-rgb), 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(53, 1fr);
+  gap: 3px;
+  margin-top: 1rem;
+}
+
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all var(--animation-fast);
+}
+
+.heatmap-cell.level-0 {
+  background: var(--color-bg-tertiary);
+}
+
+.heatmap-cell.level-1 {
+  background: rgba(var(--color-accent-primary-rgb), 0.3);
+}
+
+.heatmap-cell.level-2 {
+  background: rgba(var(--color-accent-primary-rgb), 0.5);
+}
+
+.heatmap-cell.level-3 {
+  background: rgba(var(--color-accent-primary-rgb), 0.7);
+}
+
+.heatmap-cell.level-4 {
+  background: var(--color-accent-primary);
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.5);
+  border: 1px solid var(--color-text-primary);
+}
+
+/* Timeline Navigation */
+.timeline-nav {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  background: rgba(var(--color-bg-secondary-rgb), 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 0.5rem 1rem;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all var(--animation-fast);
+}
+
+.nav-btn:hover {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Timeline Overview */
+.timeline-overview {
+  position: absolute;
+  top: 5rem;
+  left: 2rem;
+  right: 2rem;
+  height: 60px;
+  background: rgba(var(--color-bg-secondary-rgb), 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.overview-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.overview-viewport {
+  position: absolute;
+  background: rgba(var(--color-accent-primary-rgb), 0.2);
+  border: 2px solid var(--color-accent-primary);
+  border-radius: 4px;
+  cursor: grab;
+}
+
+.overview-viewport:active {
+  cursor: grabbing;
+}
+
+/* Statistics Panel */
+.timeline-stats {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(var(--color-bg-secondary-rgb), 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  min-width: 200px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.stat-value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* Milestone Markers */
+.milestone-marker {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: var(--color-info);
+  opacity: 0.5;
+}
+
+.milestone-flag {
+  position: absolute;
+  top: 2rem;
+  left: -8px;
+  width: 16px;
+  height: 20px;
+  background: var(--color-info);
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  cursor: pointer;
+  transition: all var(--animation-fast);
+}
+
+.milestone-flag:hover {
+  transform: scale(1.2);
+  filter: brightness(1.2);
+}
+
+/* Timeline Filters */
+.timeline-filters {
+  position: absolute;
+  top: 8rem;
+  left: 2rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  background: rgba(var(--color-bg-secondary-rgb), 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--animation-fast);
+}
+
+.filter-chip.active {
+  background: var(--color-accent-primary);
+  color: white;
+  border-color: var(--color-accent-primary);
+}
+
+.filter-chip:hover {
+  border-color: var(--color-accent-primary);
+  transform: translateY(-2px);
+}
+
+/* Timeline Tooltips */
+.timeline-tooltip {
+  position: absolute;
+  background: rgba(var(--color-bg-secondary-rgb), 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all var(--animation-fast);
+  z-index: 1000;
+  max-width: 250px;
+}
+
+.timeline-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Loading State */
+.timeline-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--color-bg-tertiary);
+  border-top-color: var(--color-accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.timeline-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  opacity: 0.5;
+}
+
+.empty-message {
+  font-size: var(--font-size-md);
+  margin-bottom: 0.5rem;
+}
+
+.empty-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}

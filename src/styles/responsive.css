@@ -1,0 +1,383 @@
+/* src/styles/responsive.css */
+
+/* Mobile First Approach */
+
+/* Small Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  /* Navigation */
+  .top-nav {
+    padding: 0.5rem;
+    height: 50px;
+  }
+  
+  .nav-left .app-title {
+    display: none;
+  }
+  
+  .search-container {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  /* Side Panel */
+  .side-panel {
+    position: fixed;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    z-index: 100;
+    transition: left var(--animation-normal);
+  }
+  
+  .side-panel.open {
+    left: 0;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  /* Galaxy Controls */
+  .galaxy-controls {
+    bottom: 1rem;
+    right: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .control-button {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Project Info */
+  .project-info {
+    left: 1rem;
+    right: 1rem;
+    bottom: 5rem;
+    min-width: auto;
+    padding: 1rem;
+  }
+  
+  .info-stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  /* Minimap - Hidden on mobile */
+  .minimap {
+    display: none;
+  }
+  
+  /* Modals */
+  .modal {
+    min-width: 95%;
+    max-width: 95%;
+    margin: 0.5rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Status Bar */
+  .status-bar {
+    font-size: var(--font-size-xs);
+    padding: 0 0.5rem;
+  }
+  
+  .status-center {
+    display: none;
+  }
+  
+  /* Forms */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  input, textarea, select {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* Large Mobile / Small Tablet (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Navigation */
+  .search-container {
+    width: 250px;
+  }
+  
+  /* Side Panel */
+  .side-panel {
+    width: 240px;
+  }
+  
+  /* Project Info */
+  .info-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Minimap - Still hidden */
+  .minimap {
+    display: none;
+  }
+  
+  /* Modals */
+  .modal {
+    min-width: 90%;
+    max-width: 500px;
+  }
+}
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Navigation */
+  .search-container {
+    width: 300px;
+  }
+  
+  /* Side Panel */
+  .side-panel {
+    width: 260px;
+  }
+  
+  /* Minimap */
+  .minimap {
+    display: block;
+    width: 150px;
+    height: 150px;
+  }
+  
+  /* Galaxy Controls */
+  .galaxy-controls {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+  
+  /* Project Info */
+  .project-info {
+    min-width: 280px;
+  }
+}
+
+/* Small Desktop (1025px - 1280px) */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  /* Side Panel */
+  .side-panel {
+    width: 280px;
+  }
+  
+  /* Search Container */
+  .search-container {
+    width: 350px;
+  }
+}
+
+/* Large Desktop (1281px and up) */
+@media (min-width: 1281px) {
+  /* Maximum content width */
+  .app-container {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+  
+  /* Side Panel */
+  .side-panel {
+    width: 320px;
+  }
+  
+  /* Search Container */
+  .search-container {
+    width: 400px;
+  }
+  
+  /* Minimap */
+  .minimap {
+    width: 200px;
+    height: 200px;
+  }
+  
+  /* Galaxy Controls */
+  .control-button {
+    width: 56px;
+    height: 56px;
+  }
+  
+  /* Project Info */
+  .project-info {
+    min-width: 360px;
+  }
+}
+
+/* High Resolution Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Sharper borders */
+  .control-button,
+  .modal,
+  .project-info,
+  .minimap {
+    border-width: 0.5px;
+  }
+  
+  /* Canvas rendering */
+  canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Orientation Specific */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Reduce vertical spacing */
+  .top-nav {
+    height: 40px;
+  }
+  
+  .galaxy-controls {
+    bottom: 0.5rem;
+  }
+  
+  .control-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .project-info {
+    bottom: 3rem;
+    padding: 0.75rem;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  /* Larger touch targets */
+  .nav-button,
+  .control-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Remove hover effects */
+  .project-item:hover,
+  .control-button:hover,
+  .nav-button:hover {
+    transform: none;
+  }
+  
+  /* Tap highlight */
+  button, a, .clickable {
+    -webkit-tap-highlight-color: rgba(var(--color-accent-primary-rgb), 0.2);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .loading-bar {
+    animation: loading-simple 2s linear infinite !important;
+  }
+  
+  @keyframes loading-simple {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+}
+
+/* Dark Mode Preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    /* Default to dark theme if no theme is set */
+    --color-bg-primary: #0A0B0F;
+    --color-bg-secondary: #141520;
+    --color-bg-tertiary: #1F2132;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #B8C1D6;
+    --color-text-tertiary: #6B7280;
+  }
+}
+
+/* Print Styles */
+@media print {
+  /* Hide UI elements */
+  .top-nav,
+  .side-panel,
+  .galaxy-controls,
+  .status-bar,
+  .modal-overlay {
+    display: none !important;
+  }
+  
+  /* Adjust layout */
+  .main-content {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Show project info */
+  .project-info {
+    position: static;
+    box-shadow: none;
+    border: 1px solid #000;
+    margin: 1rem 0;
+  }
+  
+  /* High contrast */
+  * {
+    color: #000 !important;
+    background: #FFF !important;
+  }
+}
+
+/* Accessibility Improvements */
+@media (prefers-contrast: high) {
+  /* Stronger borders */
+  .control-button,
+  .modal,
+  .project-info {
+    border-width: 2px;
+  }
+  
+  /* Higher contrast text */
+  .text-secondary {
+    color: var(--color-text-primary);
+    opacity: 0.8;
+  }
+  
+  .text-tertiary {
+    color: var(--color-text-primary);
+    opacity: 0.6;
+  }
+}
+
+/* Foldable Devices */
+@media (screen-spanning: single-fold-vertical) {
+  .app-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .side-panel {
+    grid-column: 1;
+  }
+  
+  .main-content {
+    grid-column: 2;
+  }
+}
+
+/* Ultra-wide Displays */
+@media (min-aspect-ratio: 21/9) {
+  /* Optimize for ultra-wide */
+  .galaxy-view {
+    padding: 0 10%;
+  }
+  
+  .minimap {
+    right: 5%;
+  }
+  
+  .galaxy-controls {
+    right: 5%;
+  }
+}
