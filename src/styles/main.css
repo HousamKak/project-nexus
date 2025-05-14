@@ -599,6 +599,25 @@ canvas {
   backdrop-filter: blur(4px);
 }
 
+/* Styles for Settings Modal */
+#settings-modal {
+  display: none;
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+  min-width: 400px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  z-index: 1100; /* Ensure modal appears above the overlay */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* Forms */
 .form-group {
   margin-bottom: 1.5rem;
