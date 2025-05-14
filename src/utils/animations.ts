@@ -197,7 +197,7 @@ export class Animation {
       ? Easing.getEasingFunction(config.easing)
       : config.easing || Easing.linear;
     this.onUpdate = config.onUpdate;
-    this.onComplete = config.onComplete;
+    this.onComplete = config.onComplete || undefined;
     this.startTime = Date.now();
   }
 
@@ -304,13 +304,26 @@ export class Animation {
   public isAnimating(): boolean {
     return this.isRunning;
   }
+
+  /**
+   * Get animation progress
+   */
+  public getProgress(): any {
+    if (!this.isRunning) return { opacity: 1, scale: 1 };
+
+    const elapsed = Date.now() - this.startTime;
+    const progress = Math.min(elapsed / this.duration, 1);
+    const easedProgress = this.easing(progress);
+
+    return this.interpolate(this.from, this.to, easedProgress);
+  }
 }
 
 /**
  * Animation manager
  */
 export class AnimationManager {
-  private animations: Map<string, Animation> = new Map();
+  public readonly animations: Map<string, Animation> = new Map();
   private rafId: number | null = null;
   private isRunning: boolean = false;
 
@@ -712,6 +725,9 @@ interface AnimationConfig {
   from: any;
   to: any;
   easing?: string | ((t: number) => number);
+  delay?: number; // New property for animation delay
+  repeat?: number; // New property for repeat count
+  direction?: 'normal' | 'reverse' | 'alternate'; // New property for animation direction
   onUpdate: (value: any) => void;
   onComplete?: () => void;
 }

@@ -2,7 +2,6 @@
 
 import { FileNode, FileType, FileCluster } from '../types/file';
 import { Theme } from '../types/theme';
-import { CanvasUtils } from '../utils/canvas';
 import { AnimationManager, SpringAnimation } from '../utils/animations';
 import { ValidationError } from '../utils/errors';
 
@@ -152,10 +151,10 @@ export class FileConstellation {
    * Filter files by criteria
    */
   public filterFiles(filter: FileFilter): void {
-    this.files.forEach((fileViz, id) => {
+    this.files.forEach((fileViz) => {
       const matches = this.matchesFilter(fileViz.file, filter);
       
-      this.animationManager.animate(`filter-${id}`, {
+      this.animationManager.animate(`filter-${fileViz.file.id}`, {
         from: fileViz.opacity,
         to: matches ? 1 : 0.1,
         duration: 400,
@@ -274,7 +273,7 @@ export class FileConstellation {
    * Render file clusters
    */
   private renderClusters(): void {
-    this.clusters.forEach((cluster, type) => {
+    this.clusters.forEach((cluster) => {
       // Cluster area
       const gradient = this.ctx.createRadialGradient(
         cluster.x,
@@ -685,7 +684,7 @@ export class FileConstellation {
   /**
    * Handle mouse up event
    */
-  private handleMouseUp(event: MouseEvent): void {
+  private handleMouseUp(): void {
     this.mouse.down = false;
     this.mouse.dragging = false;
     
@@ -724,7 +723,7 @@ export class FileConstellation {
    * Get file at world position
    */
   private getFileAtPosition(position: Point): FileNode | null {
-    for (const [id, fileViz] of this.files) {
+    for (const [, fileViz] of this.files) {
       const distance = Math.sqrt(
         Math.pow(position.x - fileViz.x, 2) +
         Math.pow(position.y - fileViz.y, 2)
@@ -905,8 +904,8 @@ export class FileConstellation {
       fileViz.color = this.getFileColor(fileViz.file);
     });
     
-    this.clusters.forEach((cluster, type) => {
-      cluster.color = this.getClusterColor(type);
+    this.clusters.forEach((cluster) => {
+      cluster.color = this.getClusterColor(cluster.type);
     });
   }
 
@@ -1116,10 +1115,12 @@ export class FileConstellation {
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
       const touch = event.touches[0];
-      this.handleMouseDown({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      } as MouseEvent);
+      if (touch) {
+        this.handleMouseDown({
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent);
+      }
     }
   }
 
@@ -1128,13 +1129,15 @@ export class FileConstellation {
    */
   private handleTouchMove(event: TouchEvent): void {
     event.preventDefault();
-    
+
     if (event.touches.length === 1) {
       const touch = event.touches[0];
-      this.handleMouseMove({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      } as MouseEvent);
+      if (touch) {
+        this.handleMouseMove({
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent);
+      }
     }
   }
 
@@ -1143,7 +1146,7 @@ export class FileConstellation {
    */
   private handleTouchEnd(event: TouchEvent): void {
     if (event.touches.length === 0) {
-      this.handleMouseUp({} as MouseEvent);
+      this.handleMouseUp();
     }
   }
 

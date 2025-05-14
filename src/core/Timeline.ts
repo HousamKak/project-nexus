@@ -2,7 +2,6 @@
 
 import { Activity, ActivityType, ImportanceLevel, TimeUnit } from '../types/activity';
 import { Theme } from '../types/theme';
-import { CanvasUtils } from '../utils/canvas';
 import { AnimationManager } from '../utils/animations';
 import { ValidationError } from '../utils/errors';
 import { Validator } from '../utils/validation';
@@ -258,11 +257,6 @@ export class Timeline {
    * Render timeline grid
    */
   private renderGrid(): void {
-    const startX = 0;
-    const endX = this.canvas.width / this.viewport.zoom;
-    const timeRange = this.viewport.endTime.getTime() - this.viewport.startTime.getTime();
-    
-    // Calculate grid intervals
     const unit = this.getGridUnit();
     const interval = this.getUnitDuration(unit);
     
@@ -721,18 +715,17 @@ export class Timeline {
    */
   private findActivityConnections(): Array<{ from: Activity, to: Activity }> {
     const connections: Array<{ from: Activity, to: Activity }> = [];
-    
-    // Simple example: connect commits that reference the same files
     const commitActivities = this.activities.filter(a => a.type === ActivityType.COMMIT);
     
     for (let i = 0; i < commitActivities.length - 1; i++) {
       const current = commitActivities[i];
       const next = commitActivities[i + 1];
       
-      // Check if they share files (simplified)
-      if (current.data.metadata?.files && next.data.metadata?.files) {
-        const currentFiles = new Set(current.data.metadata.files);
-        const nextFiles = new Set(next.data.metadata.files);
+      if (!current || !next) continue;
+      
+      if (current.data.metadata?.['files'] && next.data.metadata?.['files']) {
+        const currentFiles = new Set(current.data.metadata['files'] as string[]);
+        const nextFiles = new Set(next.data.metadata['files'] as string[]);
         
         const hasOverlap = Array.from(currentFiles).some(file => nextFiles.has(file));
         
@@ -766,8 +759,9 @@ export class Timeline {
         stats.commits++;
       }
       
-      if (activity.data.metadata?.files) {
-        activity.data.metadata.files.forEach((file: string) => {
+      if (activity.data.metadata?.['files']) {
+        const files = activity.data.metadata['files'] as string[];
+        files.forEach((file: string) => {
           changedFiles.add(file);
         });
       }
@@ -948,6 +942,8 @@ export class Timeline {
     
     const firstActivity = this.activities[0];
     const lastActivity = this.activities[this.activities.length - 1];
+    
+    if (!firstActivity || !lastActivity) return;
     
     const padding = 24 * 60 * 60 * 1000; // 1 day padding
     
@@ -1175,10 +1171,12 @@ export class Timeline {
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
       const touch = event.touches[0];
-      this.handleMouseDown({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      } as MouseEvent);
+      if (touch) {
+        this.handleMouseDown({
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent);
+      }
     }
   }
 
@@ -1187,13 +1185,15 @@ export class Timeline {
    */
   private handleTouchMove(event: TouchEvent): void {
     event.preventDefault();
-    
+
     if (event.touches.length === 1) {
       const touch = event.touches[0];
-      this.handleMouseMove({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      } as MouseEvent);
+      if (touch) {
+        this.handleMouseMove({
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent);
+      }
     }
   }
 

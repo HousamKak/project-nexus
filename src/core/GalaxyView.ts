@@ -3,7 +3,6 @@
 import { Project, ProjectPosition, OrbitalRing, PlanetSize } from '../types/project';
 import { Theme } from '../types/theme';
 import { ValidationError } from '../utils/errors';
-import { CanvasUtils } from '../utils/canvas';
 import { AnimationManager } from '../utils/animations';
 
 /**
@@ -16,15 +15,15 @@ export class GalaxyView {
   private projects: Map<string, Project>;
   private theme: Theme;
   private animationManager: AnimationManager;
-  
+
   private camera: Camera;
   private mouse: MouseState;
-  private selectedProject: string | null;
+  private selectedProject: string | null = null;
   private hoveredProject: string | null;
-  
+
   private stars: Star[];
   private nebulae: Nebula[];
-  
+
   private readonly MIN_ZOOM = 0.1;
   private readonly MAX_ZOOM = 5.0;
   private readonly ORBIT_SPEEDS = {
@@ -37,25 +36,25 @@ export class GalaxyView {
     if (!canvas) {
       throw new ValidationError('canvas', canvas, 'Canvas element is required');
     }
-    
+
     const context = canvas.getContext('2d');
     if (!context) {
       throw new ValidationError('canvas', canvas, 'Failed to get 2D context');
     }
-    
+
     this.canvas = canvas;
     this.ctx = context;
     this.projects = new Map();
     this.theme = theme;
     this.animationManager = new AnimationManager();
-    
+
     this.camera = {
       x: 0,
       y: 0,
       zoom: 1,
       rotation: 0
     };
-    
+
     this.mouse = {
       x: 0,
       y: 0,
@@ -64,13 +63,12 @@ export class GalaxyView {
       startX: 0,
       startY: 0
     };
-    
-    this.selectedProject = null;
+
     this.hoveredProject = null;
-    
+
     this.stars = this.generateStarfield(500);
     this.nebulae = this.generateNebulae(3);
-    
+
     this.setupEventListeners();
     this.startRenderLoop();
   }
@@ -82,24 +80,24 @@ export class GalaxyView {
     if (!project || !project.id) {
       throw new ValidationError('project', project, 'Invalid project: missing id');
     }
-    
+
     if (this.projects.has(project.id)) {
       throw new ValidationError('project.id', project.id, 'Project already exists');
     }
-    
+
     // Validate project data
     this.validateProject(project);
-    
+
     // Calculate initial position if not provided
     if (!project.position) {
       project.position = this.calculateOrbitPosition(project);
     }
-    
+
     this.projects.set(project.id, project);
-    
+
     // Animate the addition
     this.animationManager.animate('addProject', {
-      projectId: project.id,
+      id: project.id,
       duration: 1000,
       easing: 'easeOutElastic'
     });
@@ -112,10 +110,10 @@ export class GalaxyView {
     if (!this.projects.has(projectId)) {
       throw new ValidationError('projectId', projectId, 'Project not found');
     }
-    
+
     // Animate the removal
     this.animationManager.animate('removeProject', {
-      projectId,
+      id: projectId,
       duration: 500,
       easing: 'easeInBack',
       onComplete: () => {
@@ -132,12 +130,12 @@ export class GalaxyView {
     if (!project) {
       throw new ValidationError('projectId', projectId, 'Project not found');
     }
-    
+
     // Validate updates
     if (updates.position) {
       this.validatePosition(updates.position);
     }
-    
+
     // Apply updates
     Object.assign(project, updates);
     project.lastModified = new Date();
@@ -150,7 +148,7 @@ export class GalaxyView {
     if (!theme) {
       throw new ValidationError('theme', theme, 'Theme is required');
     }
-    
+
     this.theme = theme;
     this.regenerateStarfield();
   }
@@ -169,15 +167,15 @@ export class GalaxyView {
     if (camera.zoom !== undefined) {
       this.camera.zoom = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, camera.zoom));
     }
-    
+
     if (camera.x !== undefined) {
       this.camera.x = camera.x;
     }
-    
+
     if (camera.y !== undefined) {
       this.camera.y = camera.y;
     }
-    
+
     if (camera.rotation !== undefined) {
       this.camera.rotation = camera.rotation;
     }
@@ -191,9 +189,9 @@ export class GalaxyView {
     if (!project) {
       throw new ValidationError('projectId', projectId, 'Project not found');
     }
-    
+
     const position = this.calculateProjectScreenPosition(project);
-    
+
     if (animated) {
       this.animationManager.animate('cameraMove', {
         from: this.camera,
@@ -221,27 +219,27 @@ export class GalaxyView {
   private render(): void {
     const width = this.canvas.width;
     const height = this.canvas.height;
-    
+
     // Clear canvas
     this.ctx.fillStyle = this.theme.colors.backgroundPrimary;
     this.ctx.fillRect(0, 0, width, height);
-    
+
     // Apply camera transform
     this.ctx.save();
     this.ctx.translate(width / 2, height / 2);
     this.ctx.scale(this.camera.zoom, this.camera.zoom);
     this.ctx.rotate(this.camera.rotation);
     this.ctx.translate(-this.camera.x, -this.camera.y);
-    
+
     // Render layers
     this.renderStarfield();
     this.renderNebulae();
     this.renderOrbits();
     this.renderProjects();
     this.renderConnections();
-    
+
     this.ctx.restore();
-    
+
     // Render UI overlay
     this.renderUI();
   }
@@ -251,19 +249,19 @@ export class GalaxyView {
    */
   private renderStarfield(): void {
     this.ctx.fillStyle = this.theme.colors.starfield;
-    
+
     for (const star of this.stars) {
       const parallax = 1 + (star.z * 0.5);
       const x = star.x / parallax;
       const y = star.y / parallax;
       const size = star.size / parallax;
-      
+
       this.ctx.globalAlpha = star.brightness;
       this.ctx.beginPath();
       this.ctx.arc(x, y, size, 0, Math.PI * 2);
       this.ctx.fill();
     }
-    
+
     this.ctx.globalAlpha = 1;
   }
 
@@ -280,11 +278,11 @@ export class GalaxyView {
         nebula.y,
         nebula.radius
       );
-      
+
       gradient.addColorStop(0, nebula.color + '40');
       gradient.addColorStop(0.5, nebula.color + '20');
       gradient.addColorStop(1, nebula.color + '00');
-      
+
       this.ctx.fillStyle = gradient;
       this.ctx.fillRect(
         nebula.x - nebula.radius,
@@ -304,17 +302,17 @@ export class GalaxyView {
       { ring: OrbitalRing.ONGOING, radius: 350 },
       { ring: OrbitalRing.ARCHIVED, radius: 500 }
     ];
-    
+
     this.ctx.strokeStyle = this.theme.colors.orbitRing;
     this.ctx.lineWidth = 2;
     this.ctx.globalAlpha = 0.3;
-    
+
     for (const orbit of rings) {
       this.ctx.beginPath();
       this.ctx.arc(0, 0, orbit.radius, 0, Math.PI * 2);
       this.ctx.stroke();
     }
-    
+
     this.ctx.globalAlpha = 1;
   }
 
@@ -323,11 +321,11 @@ export class GalaxyView {
    */
   private renderProjects(): void {
     const time = Date.now() * 0.001;
-    
-    for (const [id, project] of this.projects) {
+
+    for (const [, project] of this.projects) {
       const position = this.calculateProjectPosition(project, time);
       const size = this.getProjectSize(project);
-      
+
       // Planet body
       const gradient = this.ctx.createRadialGradient(
         position.x,
@@ -337,18 +335,18 @@ export class GalaxyView {
         position.y,
         size
       );
-      
+
       gradient.addColorStop(0, project.theme.color + 'FF');
       gradient.addColorStop(0.7, project.theme.color + 'CC');
       gradient.addColorStop(1, project.theme.color + '80');
-      
+
       this.ctx.fillStyle = gradient;
       this.ctx.beginPath();
       this.ctx.arc(position.x, position.y, size, 0, Math.PI * 2);
       this.ctx.fill();
-      
+
       // Glow effect
-      if (project.theme.glow || id === this.hoveredProject) {
+      if (project.theme.glow || project.id === this.hoveredProject) {
         const glowGradient = this.ctx.createRadialGradient(
           position.x,
           position.y,
@@ -357,16 +355,16 @@ export class GalaxyView {
           position.y,
           size * 2
         );
-        
+
         glowGradient.addColorStop(0, project.theme.color + '40');
         glowGradient.addColorStop(1, project.theme.color + '00');
-        
+
         this.ctx.fillStyle = glowGradient;
         this.ctx.beginPath();
         this.ctx.arc(position.x, position.y, size * 2, 0, Math.PI * 2);
         this.ctx.fill();
       }
-      
+
       // Active indicator
       if (project.status === 'active') {
         this.ctx.strokeStyle = this.theme.colors.accentPrimary;
@@ -385,16 +383,16 @@ export class GalaxyView {
     this.ctx.strokeStyle = this.theme.colors.textTertiary;
     this.ctx.lineWidth = 1;
     this.ctx.globalAlpha = 0.5;
-    
-    for (const [id, project] of this.projects) {
+
+    for (const [, project] of this.projects) {
       if (project.dependencies) {
         const fromPos = this.calculateProjectPosition(project, Date.now() * 0.001);
-        
+
         for (const depId of project.dependencies) {
           const dep = this.projects.get(depId);
           if (dep) {
             const toPos = this.calculateProjectPosition(dep, Date.now() * 0.001);
-            
+
             this.ctx.beginPath();
             this.ctx.moveTo(fromPos.x, fromPos.y);
             this.ctx.lineTo(toPos.x, toPos.y);
@@ -403,7 +401,7 @@ export class GalaxyView {
         }
       }
     }
-    
+
     this.ctx.globalAlpha = 1;
   }
 
@@ -413,12 +411,12 @@ export class GalaxyView {
   private renderUI(): void {
     // Minimap
     this.renderMinimap();
-    
+
     // Project tooltip
     if (this.hoveredProject) {
       this.renderTooltip(this.hoveredProject);
     }
-    
+
     // Controls hint
     this.renderControlsHint();
   }
@@ -429,7 +427,7 @@ export class GalaxyView {
   private calculateProjectPosition(project: Project, time: number): Point {
     const ringRadius = this.getRingRadius(project.position.ring);
     const angle = project.position.angle + (time * this.ORBIT_SPEEDS[project.position.ring]);
-    
+
     return {
       x: Math.cos(angle) * ringRadius,
       y: Math.sin(angle) * ringRadius
@@ -473,7 +471,7 @@ export class GalaxyView {
       [PlanetSize.MEDIUM]: 30,
       [PlanetSize.LARGE]: 40
     };
-    
+
     return baseSize[project.position.size] || 30;
   }
 
@@ -486,7 +484,7 @@ export class GalaxyView {
       [OrbitalRing.ONGOING]: 350,
       [OrbitalRing.ARCHIVED]: 500
     };
-    
+
     return radii[ring] || 350;
   }
 
@@ -496,7 +494,7 @@ export class GalaxyView {
   private generateStarfield(count: number): Star[] {
     const stars: Star[] = [];
     const range = 2000;
-    
+
     for (let i = 0; i < count; i++) {
       stars.push({
         x: (Math.random() - 0.5) * range,
@@ -506,7 +504,7 @@ export class GalaxyView {
         brightness: Math.random() * 0.8 + 0.2
       });
     }
-    
+
     return stars;
   }
 
@@ -516,16 +514,17 @@ export class GalaxyView {
   private generateNebulae(count: number): Nebula[] {
     const nebulae: Nebula[] = [];
     const colors = this.theme.colors.nebula;
-    
+
     for (let i = 0; i < count; i++) {
+      const color = colors[Math.floor(Math.random() * colors.length)] || '#FFFFFF';
       nebulae.push({
         x: (Math.random() - 0.5) * 1000,
         y: (Math.random() - 0.5) * 1000,
         radius: Math.random() * 200 + 100,
-        color: colors[Math.floor(Math.random() * colors.length)]
+        color
       });
     }
-    
+
     return nebulae;
   }
 
@@ -538,15 +537,15 @@ export class GalaxyView {
     this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
     this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
     this.canvas.addEventListener('wheel', this.handleWheel.bind(this));
-    
+
     // Touch events
     this.canvas.addEventListener('touchstart', this.handleTouchStart.bind(this));
     this.canvas.addEventListener('touchmove', this.handleTouchMove.bind(this));
     this.canvas.addEventListener('touchend', this.handleTouchEnd.bind(this));
-    
+
     // Keyboard events
     window.addEventListener('keydown', this.handleKeyDown.bind(this));
-    
+
     // Resize events
     window.addEventListener('resize', this.handleResize.bind(this));
   }
@@ -558,17 +557,19 @@ export class GalaxyView {
     this.mouse.down = true;
     this.mouse.startX = event.clientX;
     this.mouse.startY = event.clientY;
-    
+
     const worldPos = this.screenToWorld({
       x: event.clientX,
       y: event.clientY
     });
-    
+
     // Check for project click
     const project = this.getProjectAtPosition(worldPos);
     if (project) {
       this.selectedProject = project.id;
       this.dispatchEvent('projectSelected', { project });
+    } else {
+      this.selectedProject = null;
     }
   }
 
@@ -578,14 +579,14 @@ export class GalaxyView {
   private handleMouseMove(event: MouseEvent): void {
     this.mouse.x = event.clientX;
     this.mouse.y = event.clientY;
-    
+
     if (this.mouse.down) {
       const dx = event.clientX - this.mouse.startX;
       const dy = event.clientY - this.mouse.startY;
-      
+
       this.camera.x -= dx / this.camera.zoom;
       this.camera.y -= dy / this.camera.zoom;
-      
+
       this.mouse.startX = event.clientX;
       this.mouse.startY = event.clientY;
       this.mouse.dragging = true;
@@ -595,7 +596,7 @@ export class GalaxyView {
         x: event.clientX,
         y: event.clientY
       });
-      
+
       const project = this.getProjectAtPosition(worldPos);
       this.hoveredProject = project ? project.id : null;
     }
@@ -604,7 +605,7 @@ export class GalaxyView {
   /**
    * Handle mouse up event
    */
-  private handleMouseUp(event: MouseEvent): void {
+  private handleMouseUp(): void {
     this.mouse.down = false;
     this.mouse.dragging = false;
   }
@@ -614,24 +615,24 @@ export class GalaxyView {
    */
   private handleWheel(event: WheelEvent): void {
     event.preventDefault();
-    
+
     const zoomDelta = event.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = this.camera.zoom * zoomDelta;
-    
+
     if (newZoom >= this.MIN_ZOOM && newZoom <= this.MAX_ZOOM) {
       // Zoom towards mouse position
       const mouseWorld = this.screenToWorld({
         x: event.clientX,
         y: event.clientY
       });
-      
+
       this.camera.zoom = newZoom;
-      
+
       const mouseWorldAfter = this.screenToWorld({
         x: event.clientX,
         y: event.clientY
       });
-      
+
       this.camera.x += mouseWorld.x - mouseWorldAfter.x;
       this.camera.y += mouseWorld.y - mouseWorldAfter.y;
     }
@@ -642,21 +643,21 @@ export class GalaxyView {
    */
   private getProjectAtPosition(position: Point): Project | null {
     const time = Date.now() * 0.001;
-    
-    for (const [id, project] of this.projects) {
+
+    for (const [, project] of this.projects) {
       const projectPos = this.calculateProjectPosition(project, time);
       const size = this.getProjectSize(project);
-      
+
       const distance = Math.sqrt(
         Math.pow(position.x - projectPos.x, 2) +
         Math.pow(position.y - projectPos.y, 2)
       );
-      
+
       if (distance <= size) {
         return project;
       }
     }
-    
+
     return null;
   }
 
@@ -669,7 +670,7 @@ export class GalaxyView {
       this.animationManager.update();
       requestAnimationFrame(animate);
     };
-    
+
     animate();
   }
 
@@ -687,11 +688,11 @@ export class GalaxyView {
     if (!project.name || project.name.trim().length === 0) {
       throw new ValidationError('project.name', project.name, 'Project name is required');
     }
-    
+
     if (!project.path || project.path.trim().length === 0) {
       throw new ValidationError('project.path', project.path, 'Project path is required');
     }
-    
+
     if (project.position) {
       this.validatePosition(project.position);
     }
@@ -704,11 +705,11 @@ export class GalaxyView {
     if (!Object.values(OrbitalRing).includes(position.ring)) {
       throw new ValidationError('position.ring', position.ring, 'Invalid orbital ring');
     }
-    
+
     if (position.angle < 0 || position.angle > 360) {
       throw new ValidationError('position.angle', position.angle, 'Angle must be between 0 and 360');
     }
-    
+
     if (!Object.values(PlanetSize).includes(position.size)) {
       throw new ValidationError('position.size', position.size, 'Invalid planet size');
     }
@@ -725,10 +726,10 @@ export class GalaxyView {
     } else if (project.status === 'archived' || project.status === 'completed') {
       ring = OrbitalRing.ARCHIVED;
     }
-    
+
     // Find an empty spot on the ring
     const angle = this.findEmptyAngle(ring);
-    
+
     // Determine size based on project stats
     let size = PlanetSize.MEDIUM;
     if (project.stats.files < 20) {
@@ -736,7 +737,7 @@ export class GalaxyView {
     } else if (project.stats.files > 100) {
       size = PlanetSize.LARGE;
     }
-    
+
     return {
       ring,
       angle,
@@ -753,26 +754,28 @@ export class GalaxyView {
       .filter(p => p.position.ring === ring)
       .map(p => p.position.angle)
       .sort((a, b) => a - b);
-    
+
     if (projectsOnRing.length === 0) {
       return Math.random() * 360;
     }
-    
-    // Find the largest gap
+
     let largestGap = 0;
     let bestAngle = 0;
-    
+
     for (let i = 0; i < projectsOnRing.length; i++) {
       const current = projectsOnRing[i];
       const next = projectsOnRing[(i + 1) % projectsOnRing.length];
-      const gap = (next - current + 360) % 360;
-      
-      if (gap > largestGap) {
-        largestGap = gap;
-        bestAngle = (current + gap / 2) % 360;
+
+      if (current !== undefined && next !== undefined) {
+        const gap = (next - current + 360) % 360;
+
+        if (gap > largestGap) {
+          largestGap = gap;
+          bestAngle = (current + gap / 2) % 360;
+        }
       }
     }
-    
+
     return bestAngle;
   }
 
@@ -792,37 +795,37 @@ export class GalaxyView {
     const margin = 20;
     const x = this.canvas.width - minimapSize - margin;
     const y = margin;
-    
+
     // Background
     this.ctx.fillStyle = this.theme.colors.backgroundSecondary + 'CC';
     this.ctx.fillRect(x, y, minimapSize, minimapSize);
-    
+
     // Border
     this.ctx.strokeStyle = this.theme.colors.textTertiary;
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(x, y, minimapSize, minimapSize);
-    
+
     // Projects
     const scale = minimapSize / 1200; // Adjust based on galaxy size
     const center = minimapSize / 2;
-    
-    for (const [id, project] of this.projects) {
+
+    for (const [, project] of this.projects) {
       const pos = this.calculateProjectPosition(project, Date.now() * 0.001);
       const minimapX = x + center + pos.x * scale;
       const minimapY = y + center + pos.y * scale;
-      
+
       this.ctx.fillStyle = project.theme.color;
       this.ctx.beginPath();
       this.ctx.arc(minimapX, minimapY, 2, 0, Math.PI * 2);
       this.ctx.fill();
     }
-    
+
     // Camera viewport
     const viewportWidth = (this.canvas.width / this.camera.zoom) * scale;
     const viewportHeight = (this.canvas.height / this.camera.zoom) * scale;
     const viewportX = x + center - (this.camera.x * scale) - viewportWidth / 2;
     const viewportY = y + center - (this.camera.y * scale) - viewportHeight / 2;
-    
+
     this.ctx.strokeStyle = this.theme.colors.accentPrimary;
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(viewportX, viewportY, viewportWidth, viewportHeight);
@@ -834,50 +837,50 @@ export class GalaxyView {
   private renderTooltip(projectId: string): void {
     const project = this.projects.get(projectId);
     if (!project) return;
-    
+
     const pos = this.calculateProjectScreenPosition(project);
     const padding = 10;
     const width = 200;
     const height = 100;
-    
+
     let x = pos.x + 20;
     let y = pos.y - height / 2;
-    
+
     // Keep tooltip on screen
     if (x + width > this.canvas.width) {
       x = pos.x - width - 20;
     }
-    
+
     if (y < 0) {
       y = padding;
     } else if (y + height > this.canvas.height) {
       y = this.canvas.height - height - padding;
     }
-    
+
     // Background
     this.ctx.fillStyle = this.theme.colors.backgroundSecondary + 'EE';
     this.ctx.fillRect(x, y, width, height);
-    
+
     // Border
     this.ctx.strokeStyle = project.theme.color;
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(x, y, width, height);
-    
+
     // Content
     this.ctx.fillStyle = this.theme.colors.textPrimary;
     this.ctx.font = `bold ${this.theme.typography.fontSize.md} ${this.theme.typography.fontFamily.primary}`;
     this.ctx.fillText(project.name, x + padding, y + padding + 16);
-    
+
     this.ctx.font = `${this.theme.typography.fontSize.sm} ${this.theme.typography.fontFamily.primary}`;
     this.ctx.fillStyle = this.theme.colors.textSecondary;
-    
+
     const lines = [
       `Files: ${project.stats.files}`,
       `Lines: ${project.stats.lines.toLocaleString()}`,
       `Health: ${project.stats.health}%`,
       `Last active: ${this.formatDate(project.lastModified)}`
     ];
-    
+
     lines.forEach((line, index) => {
       this.ctx.fillText(line, x + padding, y + padding + 40 + index * 16);
     });
@@ -892,13 +895,13 @@ export class GalaxyView {
       'Drag: Pan',
       'Click: Select'
     ];
-    
+
     const margin = 20;
     const lineHeight = 20;
-    
+
     this.ctx.fillStyle = this.theme.colors.textTertiary;
     this.ctx.font = `${this.theme.typography.fontSize.sm} ${this.theme.typography.fontFamily.primary}`;
-    
+
     hints.forEach((hint, index) => {
       this.ctx.fillText(hint, margin, this.canvas.height - margin - (hints.length - index - 1) * lineHeight);
     });
@@ -911,7 +914,7 @@ export class GalaxyView {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
+
     if (days === 0) {
       const hours = Math.floor(diff / (1000 * 60 * 60));
       if (hours === 0) {
@@ -940,10 +943,12 @@ export class GalaxyView {
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
       const touch = event.touches[0];
-      this.handleMouseDown({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      } as MouseEvent);
+      if (touch) {
+        this.handleMouseDown({
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent);
+      }
     }
   }
 
@@ -952,29 +957,33 @@ export class GalaxyView {
    */
   private handleTouchMove(event: TouchEvent): void {
     event.preventDefault();
-    
+
     if (event.touches.length === 1) {
       const touch = event.touches[0];
-      this.handleMouseMove({
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      } as MouseEvent);
+      if (touch) {
+        this.handleMouseMove({
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent);
+      }
     } else if (event.touches.length === 2) {
-      // Pinch to zoom
       const touch1 = event.touches[0];
       const touch2 = event.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
-      
-      if (this.pinchDistance) {
-        const scale = distance / this.pinchDistance;
-        this.camera.zoom *= scale;
-        this.camera.zoom = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, this.camera.zoom));
+
+      if (touch1 && touch2) {
+        const distance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        );
+
+        if (this.pinchDistance !== undefined) {
+          const scale = distance / this.pinchDistance;
+          this.camera.zoom *= scale;
+          this.camera.zoom = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, this.camera.zoom));
+        }
+
+        this.pinchDistance = distance;
       }
-      
-      this.pinchDistance = distance;
     }
   }
 
@@ -983,7 +992,7 @@ export class GalaxyView {
    */
   private handleTouchEnd(event: TouchEvent): void {
     if (event.touches.length === 0) {
-      this.handleMouseUp({} as MouseEvent);
+      this.handleMouseUp();
       this.pinchDistance = undefined;
     }
   }
@@ -1036,7 +1045,7 @@ export class GalaxyView {
   }
 
   // Private member fields
-  private pinchDistance?: number;
+  private pinchDistance: number | undefined;
 }
 
 // Supporting interfaces

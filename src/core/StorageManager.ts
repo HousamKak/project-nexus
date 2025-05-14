@@ -36,7 +36,7 @@ export class StorageManager {
   /**
    * Initialize IndexedDB
    */
-  private async initializeDB(): Promise<void> {
+  public async initializeDB(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
       

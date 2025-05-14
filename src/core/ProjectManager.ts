@@ -83,7 +83,6 @@ export class ProjectManager {
       name: projectData.name,
       description: projectData.description || '',
       path: projectData.path,
-      gitUrl: projectData.gitUrl,
       created: new Date(),
       lastModified: new Date(),
       status: projectData.status || ProjectStatus.ACTIVE,
@@ -91,7 +90,8 @@ export class ProjectManager {
       position: projectData.position || this.generateDefaultPosition(),
       theme: projectData.theme || this.getDefaultTheme(),
       tags: projectData.tags || [],
-      dependencies: projectData.dependencies || []
+      dependencies: projectData.dependencies || [],
+      ...(projectData.gitUrl ? { gitUrl: projectData.gitUrl } : {})
     };
     
     // Validate complete project
@@ -446,14 +446,10 @@ export class ProjectManager {
     // Create new project with cloned data
     const clonedProject = await this.createProject({
       ...sourceProject,
-      id: undefined, // Will be generated
+      id: this.generateId(), // Generate a new ID instead of undefined
       name: newName,
       created: new Date(),
-      lastModified: new Date(),
-      stats: { ...sourceProject.stats },
-      position: this.generateDefaultPosition(),
-      tags: [...sourceProject.tags],
-      dependencies: [...sourceProject.dependencies]
+      lastModified: new Date()
     });
     
     // Clone files
@@ -507,7 +503,7 @@ export class ProjectManager {
     // Create new project with imported data
     const importedProject = await this.createProject({
       ...data.project,
-      id: undefined, // Generate new ID
+      id: this.generateId(), // Generate a new ID instead of undefined
       created: new Date(),
       lastModified: new Date()
     });

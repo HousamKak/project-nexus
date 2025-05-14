@@ -26,5 +26,4 @@ export { terminalGreenTheme } from './themes/terminal-green';
 export { createTheme, applyThemeToCSS } from './themes/base-theme';
 
 // Main application
-export { ProjectNexus } from './app';
-export default ProjectNexus;
+export { default } from './app';

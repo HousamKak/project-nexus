@@ -213,9 +213,22 @@ export class ErrorHandler {
   }
 
   /**
+   * Notify error to external service
+   */
+  private static notify(error: Error): void {
+    if (process.env['NODE_ENV'] === 'production' && (window as any)['errorReporter']) {
+      (window as any)['errorReporter'].logError({
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
+  }
+
+  /**
    * Show error notification to user
    */
-  public static notify(error: Error, type: 'error' | 'warning' = 'error'): void {
+  public static notifyUser(error: Error, type: 'error' | 'warning' = 'error'): void {
     const message = this.handle(error);
     
     // Dispatch custom event for toast notification
@@ -229,7 +242,7 @@ export class ErrorHandler {
   }
 
   /**
-   * Wrap async function with error handling
+   * Fix async wrap method
    */
   public static async wrap<T>(
     fn: () => Promise<T>,
@@ -238,7 +251,7 @@ export class ErrorHandler {
     try {
       return await fn();
     } catch (error) {
-      this.log(error, { context });
+      this.log(error as Error, { context });
       this.notify(error as Error);
       return null;
     }
@@ -259,7 +272,7 @@ export class ErrorHandler {
         if (result instanceof Promise) {
           return result.catch((error: Error) => {
             this.log(error, { context, args });
-            this.notify(error);
+            this.notifyUser(error);
             throw error;
           });
         }
@@ -267,7 +280,7 @@ export class ErrorHandler {
         return result;
       } catch (error) {
         this.log(error as Error, { context, args });
-        this.notify(error as Error);
+        this.notifyUser(error as Error);
         throw error;
       }
     }) as T;
@@ -292,7 +305,7 @@ export class RetryHandler {
     const maxRetries = options.maxRetries || this.DEFAULT_MAX_RETRIES;
     const delay = options.delay || this.DEFAULT_DELAY;
     const backoff = options.backoff || this.DEFAULT_BACKOFF;
-    const shouldRetry = options.shouldRetry || ((error: Error) => true);
+    const shouldRetry = options.shouldRetry || (() => true);
 
     let lastError: Error;
     
@@ -302,7 +315,7 @@ export class RetryHandler {
       } catch (error) {
         lastError = error as Error;
         
-        if (attempt === maxRetries || !shouldRetry(lastError)) {
+        if (attempt === maxRetries || !shouldRetry(error as Error)) {
           throw lastError;
         }
         

@@ -504,7 +504,6 @@ export class ProjectNexus {
         name,
         description,
         path,
-        gitUrl: gitUrl || undefined,
         created: new Date(),
         lastModified: new Date(),
         status: ProjectStatus.ACTIVE,
@@ -527,7 +526,8 @@ export class ProjectNexus {
           glow: true
         },
         tags: [],
-        dependencies: []
+        dependencies: [],
+        ...(gitUrl ? { gitUrl } : {})
       };
       
       // Save project

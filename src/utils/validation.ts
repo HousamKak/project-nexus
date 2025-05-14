@@ -383,6 +383,28 @@ export class Validator {
   }
 
   /**
+   * Validate a string with constraints on type, length, and field name
+   */
+  public static validateString(
+    value: string,
+    fieldName: string,
+    minLength: number = 0,
+    maxLength: number = Infinity
+  ): void {
+    if (typeof value !== 'string') {
+      throw new ValidationError(fieldName, value, `${fieldName} must be a string`);
+    }
+
+    if (value.length < minLength) {
+      throw new ValidationError(fieldName, value, `${fieldName} must be at least ${minLength} characters`);
+    }
+
+    if (value.length > maxLength) {
+      throw new ValidationError(fieldName, value, `${fieldName} must be at most ${maxLength} characters`);
+    }
+  }
+
+  /**
    * Validate number range
    */
   public static validateNumberRange(

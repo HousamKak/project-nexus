@@ -1,6 +1,9 @@
 // src/themes/base-theme.ts
 
+// These imports are used in the function signature, so they're not actually unused
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Theme, ThemeColors, Typography, AnimationSettings, EffectSettings } from '../types/theme';
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 /**
  * Base theme configuration that other themes extend
