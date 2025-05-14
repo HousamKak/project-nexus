@@ -68,6 +68,9 @@ export class ProjectNexus {
       // Load projects
       await this.loadProjects();
       
+      // Cleanup broken projects
+      await this.cleanupProjects();
+      
       // Setup event listeners
       this.setupEventListeners();
       
@@ -209,6 +212,26 @@ export class ProjectNexus {
   }
 
   /**
+   * Cleanup function to remove broken or not-found projects
+   */
+  private async cleanupProjects(): Promise<void> {
+    const projectList = document.getElementById('project-list');
+    if (!projectList) return;
+
+    const projectItems = projectList.querySelectorAll('.project-item');
+    for (const item of projectItems) {
+        const projectId = item.getAttribute('data-project-id');
+        if (projectId) {
+            const projectExists = this.projectManager.getProject(projectId);
+            if (!projectExists) {
+                console.warn(`Removing broken or not-found project: ${projectId}`);
+                item.remove();
+            }
+        }
+    }
+  }
+
+  /**
    * Setup event listeners
    */
   private setupEventListeners(): void {
@@ -232,6 +255,26 @@ export class ProjectNexus {
     // Project management
     document.getElementById('add-project')?.addEventListener('click', () => {
       this.showAddProjectModal();
+    });
+
+    // Add event listener for delete project buttons
+    document.getElementById('project-list')?.addEventListener('click', async (event) => {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('delete-project-button')) {
+        const projectItem = target.closest('.project-item');
+        if (projectItem) {
+          const projectId = projectItem.getAttribute('data-project-id');
+          if (projectId) {
+            try {
+              await this.projectManager.deleteProject(projectId);
+              projectItem.remove(); // Remove the project from the DOM
+              console.log(`Project ${projectId} deleted successfully.`);
+            } catch (error) {
+              console.error(`Failed to delete project ${projectId}:`, error);
+            }
+          }
+        }
+      }
     });
     
     // Search

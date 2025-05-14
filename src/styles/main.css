@@ -224,8 +224,9 @@ a:hover {
   overflow: hidden;
 }
 
-/* Add styles for the collapsed class to hide the side panel */
+/* Update the collapsed class to remove the side panel from the document flow */
 .side-panel.collapsed {
+  position: absolute;
   transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
 }
