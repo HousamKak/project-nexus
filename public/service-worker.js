@@ -20,7 +20,10 @@ self.addEventListener('install', event => {
         console.log('Opened cache');
         // Temporarily exclude missing images from caching
         const filteredUrlsToCache = urlsToCache.filter(url => !url.includes('icon-192.png') && !url.includes('icon-512.png'));
-        return cache.addAll(filteredUrlsToCache);
+        console.log('Filtered URLs to cache:', filteredUrlsToCache);
+        return cache.addAll(filteredUrlsToCache).catch(error => {
+          console.error('Failed to cache resources:', error);
+        });
       })
   );
 });
