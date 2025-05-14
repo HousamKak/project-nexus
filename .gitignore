@@ -112,3 +112,5 @@ lerna-debug.log*
 *.bak
 .history/
 .temp/
+
+*.env

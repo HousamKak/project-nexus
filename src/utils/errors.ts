@@ -74,7 +74,7 @@ export class NetworkError extends NexusError {
     super(message, 'NETWORK_ERROR', { url, status, ...context });
     this.name = 'NetworkError';
     this.url = url;
-    this.status = status;
+    this.status = status ?? undefined; // Use nullish coalescing
   }
 }
 
@@ -151,7 +151,7 @@ export class ErrorHandler {
    * Format Nexus error for display
    */
   private static formatNexusError(error: NexusError): string {
-    const baseMessage = this.ERROR_MESSAGES[error.code] || error.message;
+    const baseMessage = this.ERROR_MESSAGES[error.code as keyof typeof this.ERROR_MESSAGES] || error.message;
 
     switch (error.code) {
       case 'VALIDATION_ERROR':
@@ -172,10 +172,10 @@ export class ErrorHandler {
 
       case 'PERMISSION_ERROR':
         const permissionError = error as PermissionError;
-        return `${baseMessage}: ${permissionError.resource} - ${error.message}`;
+        return `${baseMessage}: ${permissionError.resource} - ${permissionError.action}`;
 
       default:
-        return error.message;
+        return baseMessage;
     }
   }
 
@@ -191,7 +191,15 @@ export class ErrorHandler {
    */
   public static log(error: Error, context?: any): void {
     const timestamp = new Date().toISOString();
-    const errorInfo = {
+    const errorInfo: {
+      timestamp: string;
+      name: string;
+      message: string;
+      stack: string | undefined;
+      context: any;
+      code?: string;
+      nexusContext?: any;
+    } = {
       timestamp,
       name: error.name,
       message: error.message,
@@ -200,15 +208,15 @@ export class ErrorHandler {
     };
 
     if (error instanceof NexusError) {
-      errorInfo['code'] = error.code;
-      errorInfo['nexusContext'] = error.context;
+      errorInfo.code = error.code;
+      errorInfo.nexusContext = error.context;
     }
 
     console.error('Error logged:', errorInfo);
 
     // In production, send to error tracking service
-    if (process.env.NODE_ENV === 'production' && window['errorReporter']) {
-      window['errorReporter'].logError(errorInfo);
+    if (process.env['NODE_ENV'] === 'production' && (window as any)['errorReporter']) {
+      (window as any)['errorReporter'].logError(errorInfo);
     }
   }
 

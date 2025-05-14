@@ -759,11 +759,10 @@ export class Timeline {
         stats.commits++;
       }
       
-      if (activity.data.metadata?.['files']) {
-        const files = activity.data.metadata['files'] as string[];
-        files.forEach((file: string) => {
-          changedFiles.add(file);
-        });
+      const metadata = activity.data.metadata;
+      if (metadata && metadata['files']) {  // Add null check
+        const files = metadata['files'] as string[];
+        files.forEach((file: string) => changedFiles.add(file));
       }
       
       activeDays.add(this.getDateKey(activity.timestamp));
@@ -862,7 +861,7 @@ export class Timeline {
   /**
    * Handle mouse up event
    */
-  private handleMouseUp(event: MouseEvent): void {
+  private handleMouseUp(): void {
     this.mouse.down = false;
     this.mouse.dragging = false;
   }
@@ -1083,7 +1082,8 @@ export class Timeline {
    * Get date key for heatmap
    */
   private getDateKey(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const isoString = date.toISOString().split('T')[0];
+    return isoString || '';  // Add fallback
   }
 
   /**
@@ -1202,7 +1202,7 @@ export class Timeline {
    */
   private handleTouchEnd(event: TouchEvent): void {
     if (event.touches.length === 0) {
-      this.handleMouseUp({} as MouseEvent);
+      this.handleMouseUp();
     }
   }
 

@@ -227,21 +227,27 @@ export class CanvasUtils {
     lineWidth: number = 1
   ): void {
     if (points.length < 3) return;
-    
+
     ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    
-    for (let i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i].x, points[i].y);
+    const firstPoint = points[0];
+    if (firstPoint) {
+      ctx.moveTo(firstPoint.x, firstPoint.y);
     }
-    
+
+    for (let i = 1; i < points.length; i++) {
+      const point = points[i];
+      if (point) {
+        ctx.lineTo(point.x, point.y);
+      }
+    }
+
     ctx.closePath();
-    
+
     if (fillColor) {
       ctx.fillStyle = fillColor;
       ctx.fill();
     }
-    
+
     if (strokeColor) {
       ctx.strokeStyle = strokeColor;
       ctx.lineWidth = lineWidth;

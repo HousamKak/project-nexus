@@ -197,7 +197,7 @@ export class Animation {
       ? Easing.getEasingFunction(config.easing)
       : config.easing || Easing.linear;
     this.onUpdate = config.onUpdate;
-    this.onComplete = config.onComplete || undefined;
+    this.onComplete = config.onComplete;
     this.startTime = Date.now();
   }
 

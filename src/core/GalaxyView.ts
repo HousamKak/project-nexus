@@ -18,7 +18,6 @@ export class GalaxyView {
 
   private camera: Camera;
   private mouse: MouseState;
-  private selectedProject: string | null = null;
   private hoveredProject: string | null;
 
   private stars: Star[];
@@ -566,10 +565,7 @@ export class GalaxyView {
     // Check for project click
     const project = this.getProjectAtPosition(worldPos);
     if (project) {
-      this.selectedProject = project.id;
       this.dispatchEvent('projectSelected', { project });
-    } else {
-      this.selectedProject = null;
     }
   }
 
@@ -1003,7 +999,6 @@ export class GalaxyView {
   private handleKeyDown(event: KeyboardEvent): void {
     switch (event.key) {
       case 'Escape':
-        this.selectedProject = null;
         break;
       case '+':
       case '=':

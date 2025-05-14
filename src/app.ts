@@ -27,8 +27,6 @@ export class ProjectNexus {
   private preferences: UserPreferences;
   private views: Map<string, HTMLElement>;
   private currentView: string = 'galaxy';
-  
-  private isInitialized: boolean = false;
 
   constructor() {
     this.storageManager = new StorageManager();
@@ -71,7 +69,6 @@ export class ProjectNexus {
       this.showLoadingScreen(false);
       this.showApp(true);
       
-      this.isInitialized = true;
       console.log('Project Nexus initialized successfully');
       
       // Register service worker for offline support
@@ -284,7 +281,8 @@ export class ProjectNexus {
     const viewOrder = ['galaxy', 'timeline', 'constellation', 'grid'];
     const currentIndex = viewOrder.indexOf(this.currentView);
     const nextIndex = (currentIndex + 1) % viewOrder.length;
-    this.switchView(viewOrder[nextIndex]);
+    const nextView = viewOrder[nextIndex] || 'galaxy'; // Default to 'galaxy' if undefined
+    this.switchView(nextView);
   }
 
   /**
@@ -292,7 +290,7 @@ export class ProjectNexus {
    */
   private switchView(viewName: string): void {
     // Hide all views
-    this.views.forEach((view, name) => {
+    this.views.forEach((view) => {
       view.classList.remove('active');
     });
     
@@ -384,6 +382,7 @@ export class ProjectNexus {
    * Switch settings tab
    */
   private switchSettingsTab(tabName: string): void {
+    if (!tabName) return;
     // Update tab buttons
     document.querySelectorAll('.tab-button').forEach(button => {
       button.classList.remove('active');
@@ -670,18 +669,17 @@ export class ProjectNexus {
     
     // Process dropped files
     const fileArray = Array.from(files);
-    
-    // Check if it's a project folder or individual files
-    if (fileArray.length === 1 && this.isProjectFolder(fileArray[0])) {
-      // Create new project from folder
-      this.createProjectFromFolder(fileArray[0]);
-    } else {
-      // Add files to current project
-      const currentProject = this.projectManager.getCurrentProject();
-      if (currentProject) {
-        this.addFilesToProject(currentProject.id, fileArray);
+    if (fileArray.length > 0 && fileArray[0]) {
+      if (this.isProjectFolder(fileArray[0])) {
+        this.createProjectFromFolder(fileArray[0]);
       } else {
-        this.showToast('Please select a project first', 'warning');
+        // Add files to current project
+        const currentProject = this.projectManager.getCurrentProject();
+        if (currentProject) {
+          this.addFilesToProject(currentProject.id, fileArray);
+        } else {
+          this.showToast('Please select a project first', 'warning');
+        }
       }
     }
   }
@@ -963,7 +961,7 @@ export class ProjectNexus {
   /**
    * Create project from folder
    */
-  private createProjectFromFolder(folder: File): void {
+  private createProjectFromFolder(_folder: File): void {
     // In real app, would analyze folder contents
     // For demo, we'll show a message
     this.showToast('Creating project from folder (demo mode)', 'info');
@@ -972,7 +970,7 @@ export class ProjectNexus {
   /**
    * Add files to project
    */
-  private addFilesToProject(projectId: string, files: File[]): void {
+  private addFilesToProject(_projectId: string, files: File[]): void {
     // In real app, would process and add files
     // For demo, we'll show a message
     this.showToast(`Adding ${files.length} files to project (demo mode)`, 'info');
