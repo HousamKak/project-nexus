@@ -77,11 +77,12 @@ export class ProjectNexus {
       
       console.log('Project Nexus initialized successfully');
       
-      // Register service worker for offline support
+      // Temporarily unregister the service worker to debug infinite reload issue
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => console.log('Service Worker registered:', registration))
-          .catch(error => console.error('Service Worker registration failed:', error));
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(registration => registration.unregister());
+          console.log('Service Worker unregistered for debugging purposes');
+        });
       }
       
     } catch (error) {

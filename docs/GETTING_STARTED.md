@@ -31,7 +31,7 @@ npm install
 npm start
 ```
 
-This will open Project Nexus in your default browser at `http://localhost:3000`.
+This will open Project Nexus in your default browser at `http://localhost:3001`.
 
 ## First Steps
 

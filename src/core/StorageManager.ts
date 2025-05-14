@@ -109,6 +109,8 @@ export class StorageManager {
       throw new ValidationError('project', project, 'Invalid project: missing id');
     }
     
+    console.log('Saving project:', project);
+    
     const db = await this.ensureDB();
     const transaction = db.transaction([this.STORES.PROJECTS], 'readwrite');
     const store = transaction.objectStore(this.STORES.PROJECTS);
@@ -166,6 +168,7 @@ export class StorageManager {
       
       request.onsuccess = () => {
         const data = request.result;
+        console.log('Retrieved projects:', data);
         resolve(data.map(p => this.deserializeProject(p)));
       };
       
