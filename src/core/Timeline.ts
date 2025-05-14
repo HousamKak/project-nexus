@@ -579,7 +579,7 @@ export class Timeline {
       if (!grouped[activity.type]) {
         grouped[activity.type] = [];
       }
-      grouped[activity.type].push(activity);
+      grouped[activity.type]!.push(activity);
     });
     
     return grouped;
